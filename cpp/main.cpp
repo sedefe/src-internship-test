@@ -80,7 +80,7 @@ void check_power_999() {
         SparseMatrix m(fname.c_str());
         auto m_power_p = m ^ 999;
 
-        SparseMatrix answer(fname.replace_extension(".out-5"));
+        SparseMatrix answer(fname.replace_extension(".out-999"));
 
         auto err = compare(m_power_p, answer);
         if (err < tolerance) {
