@@ -42,12 +42,39 @@ void SparseMatrix::Print() {
 
 SparseMatrix SparseMatrix::operator*(const SparseMatrix &m) {
     SparseMatrix result;
-    // Here's your code
+    auto n = data.size();
+    result.data.resize(n);
+
+    for (int32_t i = 0; i < n; i++) {
+        // Scalar multiplication using O(n) memory. Can be further optimized
+        std::vector<double> tmp(n, 0);
+        for (const auto &element1 : data[i]) {
+            for (const auto &element2 : m.data[element1.index]) {
+                tmp[element2.index] += element1.value * element2.value;
+            }
+        }
+        // Sparsify the i-th row
+        for (int32_t j = 0; j < n; j++) {
+            if (tmp[j] != 0) {
+                result.data[i].push_back({j, tmp[j]});
+            }
+        }
+    }
+
     return result;
 };
 
 SparseMatrix SparseMatrix::operator^(uint32_t p) {
-    SparseMatrix result;
-    // Here's your code
-    return result;
+    // Todo: if power == 0, return identity matrix
+    if (p == 1) {
+        return *this;
+    }
+
+    // Recursion
+    SparseMatrix tmp = (*this) ^ (p / 2);
+    if (p % 2 == 0) {
+        return tmp * tmp;
+    } else {
+        return tmp * tmp * (*this);
+    }
 }

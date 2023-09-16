@@ -57,17 +57,31 @@ class SparseMatrix:
         return A
 
     def __matmul__(self, other):
-
-        # vvvvv your code here vvvvv
-        result = SparseMatrix(dense=self.to_dense() @ other.to_dense())
-        # ^^^^^ your code here ^^^^^
+        result = SparseMatrix()
+        n = len(self.data_)
+        for i in range(n):
+            # Scalar multiplication using O(n) memory. Can be further optimized
+            tmp = np.zeros(n)
+            for element1 in self.data_[i]:
+                for element2 in other.data_[element1.index]:
+                    tmp[element2.index] += element1.value * element2.value
+            # Sparsify the i-th row
+            result.data_.append([])
+            for j, v in enumerate(tmp):
+                if v != 0:
+                    result.data_[-1].append(Element(j, v))
 
         return result
 
     def __pow__(self, power, modulo=None):
+        # Todo: if power == 0, return identity matrix
+        if power == 1:
+            return self  # Todo: copy
 
-        # vvvvv your code here vvvvv
-        result = SparseMatrix(dense=np.linalg.matrix_power(self.to_dense(), power))
-        # ^^^^^ your code here ^^^^^
+        # Recursion
+        result = self.__pow__(power // 2)
+        result = result @ result
+        if power % 2 == 1:
+            result @= self
 
         return result
